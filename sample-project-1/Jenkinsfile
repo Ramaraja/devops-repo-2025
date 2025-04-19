@@ -6,7 +6,9 @@ pipeline {
     }
     stages {
         stage('Setup Environment') {
-            script {
+            steps {
+                sh 'echo $ENV'
+                script {
                 if ($ENV == 'PRD'){
                     sh 'echo This is from PRD'
                     // Install dependencies
@@ -16,11 +18,7 @@ pipeline {
                 else {
                     sh 'python3 -m venv venv'
                     sh '. venv/bin/activate && pip install -r sample-project-1/requirements.txt'                    
-                }            
-                steps {
-                    
-                    sh 'echo $ENV'
-    
+                }        
                 }
             }
         }
