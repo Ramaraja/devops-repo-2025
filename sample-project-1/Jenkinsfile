@@ -5,7 +5,7 @@ pipeline {
             steps {
                 // Install dependencies
                 sh 'echo $ENV'
-                if $ENV == 'PRD'{
+                if ($ENV == 'PRD'){
                 sh 'echo This is from PRD'
                 sh 'python3 -m venv venv'
                 sh '. venv/bin/activate && pip install -r sample-project-1/requirements.txt'
