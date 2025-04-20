@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    // agent { docker { image 'python:3.12.0-alpine3.18' } }
+
+
+    environment {
+        ENV = 'PRD'
+        SONAR_TOKEN = credentials('sonar-token')
+    }
+    stages {
+
+        stage('SonarQube Analysis') {
+          steps {
+            script {
+              docker.image('sonarsource/sonar-scanner-cli').inside(
+                "-v ${env.WORKSPACE}/.sonar:/opt/sonar-scanner/.sonar"
+              ) {
+                sh '''
+                  sonar-scanner \
+                    -Dsonar.login=$SONAR_TOKEN \
+                    -Dsonar.projectKey=sample-project-1 -Dsonar.host.url=http://192.168.1.9:9000 -Dsonar.sources=.
+                '''
+              }
+            }
+          }
+        }        
+
+        stage('Archive Results') {
+            steps {
+                // Archive the test results in Jenkins
+                junit 'reports/results.xml'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up...'
+        }
+        success {
+            echo 'Tests executed successfully!'
+        }
+        failure {
+            echo 'Some tests failed.'
+        }
+    }
+}
+
